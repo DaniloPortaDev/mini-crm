@@ -2,21 +2,52 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <title>Mini CRM</title>
+    <title>Mini CRM | Danilo Porta</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="container">
       <h1>Mini CRM</h1>
 
+      <!-- 🔍 BUSCA -->
+      <input
+        type="text"
+        id="busca"
+        placeholder="Buscar cliente..."
+        style="margin-bottom: 10px"
+      />
+
       <form id="form">
-        <input type="text" id="nome" placeholder="Nome" required />
-        <input type="email" id="email" placeholder="Email" required />
+        <input
+          type="text"
+          id="nome"
+          placeholder="Nome"
+          required
+          autocomplete="name"
+        />
+
+        <input
+          type="email"
+          id="email"
+          placeholder="Email"
+          required
+          autocomplete="email"
+        />
+
         <button type="submit">Adicionar Cliente</button>
+
+        <button
+          type="button"
+          id="cancelar"
+          style="display: none; margin-top: 10px; background: #6b7280"
+        >
+          Cancelar
+        </button>
       </form>
 
       <ul id="lista"></ul>
     </div>
+
     <script src="script.js"></script>
   </body>
 </html>
