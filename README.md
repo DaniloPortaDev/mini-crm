@@ -1,23 +1,19 @@
 # Mini CRM
 
-Projeto simples de cadastro de clientes feito com HTML, CSS e JavaScript.
+Aplicação web simples para cadastro de clientes, com persistência de dados no navegador.
 
-## 🚀 Funcionalidades
-
-- Adicionar cliente
-- Listar clientes
-- Remover cliente
-
-## 🛠️ Tecnologias
-
+## 🚀 Tecnologias
 - HTML
 - CSS
 - JavaScript
 
+## 💡 Funcionalidades
+- Adicionar clientes
+- Remover clientes
+- Armazenamento com localStorage
+
+## 🌐 Deploy
+https://daniloportadev.github.io/mini-crm/
+
 ## 📚 Aprendizados
-
-Este projeto foi desenvolvido para praticar manipulação de DOM e lógica com JavaScript.
-
-## ▶️ Como rodar
-
-Basta abrir o arquivo index.html no navegador.
+Projeto focado em manipulação de DOM, eventos e armazenamento local.
