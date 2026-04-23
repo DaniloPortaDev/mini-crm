@@ -1,35 +1,41 @@
 let clientes = [];
 let editandoIndex = null;
 
-// 🔗 elementos
 const form = document.getElementById("form");
 const lista = document.getElementById("lista");
 const buscaInput = document.getElementById("busca");
-const botaoSubmit = form.querySelector("button");
+const buscaArea = document.getElementById("busca-area");
+const resumoBusca = document.getElementById("resumo-busca");
+const estadoLista = document.getElementById("estado-lista");
+const contadorClientes = document.getElementById("contador-clientes");
+const nomeInput = document.getElementById("nome");
+const emailInput = document.getElementById("email");
+const botaoSubmit = document.getElementById("salvar-cliente");
 const botaoCancelar = document.getElementById("cancelar");
+const botaoLimparBusca = document.getElementById("limpar-busca");
 
-// 💾 carregar dados
 const dadosSalvos = localStorage.getItem("clientes");
 if (dadosSalvos) {
   clientes = JSON.parse(dadosSalvos);
 }
 
-// 🔍 busca em tempo real
-buscaInput.addEventListener("input", function () {
+buscaInput.addEventListener("input", renderizar);
+
+botaoLimparBusca.addEventListener("click", () => {
+  buscaInput.value = "";
   renderizar();
+  buscaInput.focus();
 });
 
-// 🚀 submit
-form.addEventListener("submit", function (e) {
-  e.preventDefault();
-
-  const nomeInput = document.getElementById("nome");
-  const emailInput = document.getElementById("email");
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
 
   const nome = nomeInput.value.trim();
   const email = emailInput.value.trim();
 
-  if (!nome || !email) return;
+  if (!nome || !email) {
+    return;
+  }
 
   if (editandoIndex !== null) {
     clientes[editandoIndex] = { nome, email };
@@ -39,80 +45,184 @@ form.addEventListener("submit", function (e) {
   }
 
   salvarDados();
-
-  nomeInput.value = "";
-  emailInput.value = "";
-  botaoSubmit.textContent = "Adicionar Cliente";
-  botaoCancelar.style.display = "none";
-
+  limparFormulario();
+  atualizarFormulario();
   renderizar();
 });
 
-// 🖥️ renderizar com filtro
+botaoCancelar.addEventListener("click", () => {
+  editandoIndex = null;
+  limparFormulario();
+  atualizarFormulario();
+});
+
+lista.addEventListener("click", (event) => {
+  const botao = event.target.closest("button[data-action]");
+
+  if (!botao) {
+    return;
+  }
+
+  const index = Number(botao.dataset.index);
+
+  if (botao.dataset.action === "remover") {
+    remover(index);
+    return;
+  }
+
+  if (botao.dataset.action === "editar") {
+    editar(index);
+  }
+});
+
 function renderizar() {
-  lista.innerHTML = "";
-
-  const busca = buscaInput.value.toLowerCase();
-
-  clientes
-    .filter((cliente) => {
+  const busca = clientes.length > 2 ? buscaInput.value.trim().toLowerCase() : "";
+  const clientesFiltrados = clientes
+    .map((cliente, index) => ({ cliente, index }))
+    .filter(({ cliente }) => {
       return (
         cliente.nome.toLowerCase().includes(busca) ||
         cliente.email.toLowerCase().includes(busca)
       );
-    })
-    .forEach((cliente) => {
-      const indexReal = clientes.indexOf(cliente);
-
-      const li = document.createElement("li");
-
-      li.innerHTML = `
-        <span>${cliente.nome} - ${cliente.email}</span>
-        <div>
-          <button onclick="remover(${indexReal})">Remover</button>
-          <button onclick="editar(${indexReal})">Editar</button>
-        </div>
-      `;
-
-      lista.appendChild(li);
     });
+
+  lista.innerHTML = "";
+
+  clientesFiltrados.forEach(({ cliente, index }) => {
+    const item = criarItemCliente(cliente, index);
+    lista.appendChild(item);
+  });
+
+  atualizarBusca(busca, clientesFiltrados.length);
+  atualizarResumo(clientesFiltrados.length);
 }
 
-// ❌ remover
+function criarItemCliente(cliente, index) {
+  const item = document.createElement("li");
+  item.className = "client-item";
+
+  const info = document.createElement("div");
+  info.className = "client-info";
+
+  const nome = document.createElement("strong");
+  nome.className = "client-name";
+  nome.textContent = cliente.nome;
+
+  const email = document.createElement("span");
+  email.className = "client-email";
+  email.textContent = cliente.email;
+
+  info.append(nome, email);
+
+  const acoes = document.createElement("div");
+  acoes.className = "client-actions";
+
+  const editarButton = document.createElement("button");
+  editarButton.type = "button";
+  editarButton.className = "action-button";
+  editarButton.dataset.action = "editar";
+  editarButton.dataset.index = index;
+  editarButton.textContent = "Editar";
+
+  const removerButton = document.createElement("button");
+  removerButton.type = "button";
+  removerButton.className = "danger-button";
+  removerButton.dataset.action = "remover";
+  removerButton.dataset.index = index;
+  removerButton.textContent = "Remover";
+
+  acoes.append(editarButton, removerButton);
+  item.append(info, acoes);
+
+  return item;
+}
+
+function atualizarBusca(busca, totalFiltrados) {
+  const totalClientes = clientes.length;
+  const buscaAtiva = busca.length > 0;
+  const deveMostrarBusca = totalClientes > 2;
+
+  if (!deveMostrarBusca && buscaInput.value) {
+    buscaInput.value = "";
+  }
+
+  buscaArea.hidden = !deveMostrarBusca;
+  botaoLimparBusca.hidden = !deveMostrarBusca || !buscaAtiva;
+
+  if (!deveMostrarBusca) {
+    return;
+  }
+
+  if (buscaAtiva) {
+    resumoBusca.textContent = `Mostrando ${totalFiltrados} de ${totalClientes} clientes`;
+    return;
+  }
+
+  resumoBusca.textContent = "Pesquise por nome ou email";
+}
+
+function atualizarResumo(totalFiltrados) {
+  const totalClientes = clientes.length;
+  const plural = totalClientes === 1 ? "cliente cadastrado" : "clientes cadastrados";
+
+  contadorClientes.textContent = `${totalClientes} ${plural}`;
+
+  const semClientes = totalClientes === 0;
+  const semResultados = totalClientes > 0 && totalFiltrados === 0;
+
+  lista.hidden = semClientes || semResultados;
+  estadoLista.hidden = !semClientes && !semResultados;
+
+  if (semClientes) {
+    estadoLista.textContent = "Adicione o primeiro cliente para comecar.";
+    return;
+  }
+
+  if (semResultados) {
+    estadoLista.textContent = "Nenhum cliente encontrado com essa busca.";
+  }
+}
+
 function remover(index) {
   clientes.splice(index, 1);
+
+  if (editandoIndex === index) {
+    editandoIndex = null;
+    limparFormulario();
+    atualizarFormulario();
+  } else if (editandoIndex !== null && editandoIndex > index) {
+    editandoIndex -= 1;
+  }
+
   salvarDados();
   renderizar();
 }
 
-// 💾 salvar
+function editar(index) {
+  const cliente = clientes[index];
+
+  nomeInput.value = cliente.nome;
+  emailInput.value = cliente.email;
+  editandoIndex = index;
+
+  atualizarFormulario();
+  nomeInput.focus();
+}
+
+function limparFormulario() {
+  form.reset();
+}
+
+function atualizarFormulario() {
+  const editando = editandoIndex !== null;
+
+  botaoSubmit.textContent = editando ? "Salvar alteracoes" : "Adicionar cliente";
+  botaoCancelar.hidden = !editando;
+}
+
 function salvarDados() {
   localStorage.setItem("clientes", JSON.stringify(clientes));
 }
 
-// ✏️ editar
-function editar(index) {
-  const cliente = clientes[index];
-
-  document.getElementById("nome").value = cliente.nome;
-  document.getElementById("email").value = cliente.email;
-
-  botaoSubmit.textContent = "Atualizar Cliente";
-  botaoCancelar.style.display = "block";
-
-  editandoIndex = index;
-}
-
-// 🚫 cancelar
-botaoCancelar.addEventListener("click", function () {
-  editandoIndex = null;
-
-  document.getElementById("nome").value = "";
-  document.getElementById("email").value = "";
-
-  botaoSubmit.textContent = "Adicionar Cliente";
-  botaoCancelar.style.display = "none";
-});
-
-// 🔥 iniciar
+atualizarFormulario();
 renderizar();

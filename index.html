@@ -2,51 +2,94 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mini CRM | Danilo Porta</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="container">
-      <h1>Mini CRM</h1>
+    <main class="page-shell">
+      <section class="container">
+        <div class="hero">
+          <p class="eyebrow">Cadastro de clientes</p>
+          <h1>Mini CRM</h1>
+          <p class="hero-text">
+            Um painel simples para organizar contatos de um jeito mais
+            apresentavel.
+          </p>
+        </div>
 
-      <!-- 🔍 BUSCA -->
-      <input
-        type="text"
-        id="busca"
-        placeholder="Buscar cliente..."
-        style="margin-bottom: 10px"
-      />
+        <section class="search-panel" id="busca-area" hidden>
+          <div class="search-copy">
+            <p class="section-label">Buscar clientes</p>
+            <span id="resumo-busca" class="section-helper"
+              >Pesquise por nome ou email</span
+            >
+          </div>
 
-      <form id="form">
-        <input
-          type="text"
-          id="nome"
-          placeholder="Nome"
-          required
-          autocomplete="name"
-        />
+          <div class="search-controls">
+            <label class="search-field" for="busca">
+              <span class="search-icon" aria-hidden="true">&#128269;</span>
+              <input
+                type="text"
+                id="busca"
+                placeholder="Filtrar por nome ou email"
+                autocomplete="off"
+              />
+            </label>
 
-        <input
-          type="email"
-          id="email"
-          placeholder="Email"
-          required
-          autocomplete="email"
-        />
+            <button type="button" id="limpar-busca" class="ghost-button" hidden>
+              Limpar
+            </button>
+          </div>
+        </section>
 
-        <button type="submit">Adicionar Cliente</button>
+        <form id="form" class="form-card">
+          <label class="field">
+            <span>Nome</span>
+            <input
+              type="text"
+              id="nome"
+              placeholder="Ex.: Maria Oliveira"
+              required
+              autocomplete="name"
+            />
+          </label>
 
-        <button
-          type="button"
-          id="cancelar"
-          style="display: none; margin-top: 10px; background: #6b7280"
-        >
-          Cancelar
-        </button>
-      </form>
+          <label class="field">
+            <span>Email</span>
+            <input
+              type="email"
+              id="email"
+              placeholder="maria@email.com"
+              required
+              autocomplete="email"
+            />
+          </label>
 
-      <ul id="lista"></ul>
-    </div>
+          <div class="form-actions">
+            <button type="submit" id="salvar-cliente">Adicionar cliente</button>
+            <button type="button" id="cancelar" class="secondary-button" hidden>
+              Cancelar edicao
+            </button>
+          </div>
+        </form>
+
+        <div class="list-header">
+          <div>
+            <p class="section-label">Clientes</p>
+            <span class="section-helper" id="contador-clientes"
+              >0 clientes cadastrados</span
+            >
+          </div>
+        </div>
+
+        <p id="estado-lista" class="empty-state">
+          Adicione o primeiro cliente para comecar.
+        </p>
+
+        <ul id="lista" class="client-list" aria-live="polite"></ul>
+      </section>
+    </main>
 
     <script src="script.js"></script>
   </body>
