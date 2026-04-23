@@ -174,7 +174,7 @@ function atualizarResumo(totalFiltrados) {
   estadoLista.hidden = !semClientes && !semResultados;
 
   if (semClientes) {
-    estadoLista.textContent = "Adicione o primeiro cliente para comecar.";
+    estadoLista.textContent = "Adicione o primeiro cliente para come\u00e7ar.";
     return;
   }
 
@@ -216,7 +216,9 @@ function limparFormulario() {
 function atualizarFormulario() {
   const editando = editandoIndex !== null;
 
-  botaoSubmit.textContent = editando ? "Salvar alteracoes" : "Adicionar cliente";
+  botaoSubmit.textContent = editando
+    ? "Salvar altera\u00e7\u00f5es"
+    : "Adicionar cliente";
   botaoCancelar.hidden = !editando;
 }
 
